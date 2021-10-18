@@ -1,6 +1,9 @@
 use std::path::PathBuf;
 use structopt::StructOpt;
 
+use std::fs::File;
+use std::io::prelude::*;
+
 #[derive(StructOpt, Debug)]
 #[structopt(
     name = "clippings",
@@ -15,13 +18,37 @@ struct Opt {
     file: PathBuf,
 
     // Exported parsed file format
-    #[structopt(short = "e", long)]
+    #[structopt(short = "e", long, default_value = "markdown")]
     export_type: String,
 }
 
 fn main() {
-    println!("Hello, clippings!");
-
     let opt = Opt::from_args();
-    println!("{:#?}", opt);
+    println!("{:#?} \n\n\n", opt);
+
+    let display = opt.file.display();
+
+    let mut file = match File::open(&opt.file) {
+        Err(why) => panic!("couldn't open {}: {}", display, why),
+        Ok(file) => file,
+    };
+
+    let mut file_content = String::new();
+    match file.read_to_string(&mut file_content) {
+        Err(why) => panic!("couldn't read {}: {}", display, why),
+        Ok(_) => print!("{} read with success\n", display),
+    };
+
+    file_details(opt.file).expect("error");
+
+    println!("file content: {:?}", file_content);
+}
+
+fn file_details(file: PathBuf) -> std::io::Result<()> {
+    use std::fs;
+
+    let metadata = fs::metadata(file)?;
+
+    println!("{:?}", metadata.len());
+    Ok(())
 }
