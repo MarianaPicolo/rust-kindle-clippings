@@ -36,7 +36,7 @@ fn main() {
     let mut file_content = String::new();
     match file.read_to_string(&mut file_content) {
         Err(why) => panic!("couldn't read {}: {}", display, why),
-        Ok(_) => print!("{} read with success\n", display),
+        Ok(_) => println!("{} read with success", display),
     };
 
     file_details(opt.file).expect("error");
